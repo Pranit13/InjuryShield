@@ -1,0 +1,208 @@
+/* General Body Styling */
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f7f6;
+    color: #333;
+    line-height: 1.6;
+}
+
+/* Header Styling */
+header {
+    background-color: #2c3e50; /* Dark blue/grey */
+    color: #ecf0f1; /* Light grey/white */
+    padding: 1rem 0;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+header h1 {
+    margin: 0;
+    font-size: 2.2em;
+}
+
+/* Navigation Styling */
+nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 10px 0 0 0;
+    display: flex;
+    justify-content: center;
+}
+
+nav ul li {
+    margin: 0 15px;
+}
+
+nav ul li a {
+    color: #ecf0f1;
+    text-decoration: none;
+    font-weight: bold;
+    transition: color 0.3s ease;
+}
+
+nav ul li a:hover {
+    color: #3498db; /* Bright blue */
+}
+
+/* Main Content Area */
+main {
+    padding: 20px;
+    max-width: 1400px; /* Increased max-width for more content */
+    margin: 20px auto;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.05);
+}
+
+/* Section Headings */
+h2, h3 {
+    color: #2c3e50;
+    border-bottom: 2px solid #3498db;
+    padding-bottom: 5px;
+    margin-bottom: 20px;
+}
+
+/* Footer Styling */
+footer {
+    text-align: center;
+    padding: 1rem 0;
+    margin-top: 30px;
+    background-color: #34495e; /* Slightly lighter dark blue */
+    color: #ecf0f1;
+    font-size: 0.9em;
+}
+
+/* --- Dashboard Specific Styles (index.html) --- */
+.dashboard-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+}
+.video-panel, .metrics-panel {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.05);
+    padding: 20px;
+}
+.video-panel {
+    flex: 2;
+    min-width: 700px;
+    max-width: 100%;
+}
+.metrics-panel {
+    flex: 1;
+    min-width: 300px;
+    max-width: 400px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.video-container {
+    text-align: center;
+    margin-top: 10px;
+    border: 2px solid #ddd;
+    display: inline-block;
+    width: 100%;
+    /* Max width set by JS based on config.DISPLAY_WIDTH */
+}
+.video-feed {
+    width: 100%;
+    height: auto;
+    background-color: #000;
+    display: block;
+}
+.status-message {
+    margin-top: 10px;
+    font-size: 1.1em;
+    color: #555;
+    text-align: center;
+}
+.metric-item {
+    padding: 10px 0;
+    border-bottom: 1px dashed #eee;
+}
+.metric-item:last-child {
+    border-bottom: none;
+}
+.metric-item strong {
+    display: block;
+    font-size: 1.2em;
+    color: #2c3e50;
+}
+.metric-item span {
+    font-size: 0.9em;
+    color: #777;
+}
+.metric-item .value {
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #3498db;
+}
+.compliance-rate.good { color: green; }
+.compliance-rate.medium { color: orange; }
+.compliance-rate.bad { color: red; }
+
+
+/* --- History Page Specific Styles (history.html) --- */
+.data-section {
+    margin-bottom: 40px;
+}
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+.data-table th, .data-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+    vertical-align: top;
+}
+.data-table th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+    color: #333;
+}
+.data-table tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+.data-table tr:hover {
+    background-color: #f1f1f1;
+}
+/* Re-use status classes for history tables */
+/* .status-compliant, .status-violations, .status-unknown already defined */
+
+/* Analytics charts section */
+.analytics-charts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: space-around;
+    margin-top: 30px;
+}
+.chart-container {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.05);
+    padding: 20px;
+    flex: 1;
+    min-width: 45%; /* Two columns layout */
+    box-sizing: border-box;
+    text-align: center;
+}
+.chart-container img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+}
+/* Ensure canvas elements are responsive */
+.chart-container canvas {
+    width: 100% !important;
+    height: auto !important;
+    max-height: 300px; /* Constrain height */
+}

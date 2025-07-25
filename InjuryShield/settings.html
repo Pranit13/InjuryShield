@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - InjuryShield</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <style>
+        /* --- Global Styles & CSS Variables (Consistent) --- */
+        :root {
+            --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            --bg-color: #f7f8fc;
+            --sidebar-bg: #111827;
+            --card-bg: #ffffff;
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --text-on-dark: #f9fafb;
+            --accent-primary: #3b82f6;
+            --accent-secondary: #2563eb;
+            --border-color: #e5e7eb;
+            --shadow-color: rgba(99, 102, 241, 0.1);
+            --danger-color: #ef4444;
+            --success-color: #22c55e;
+            --warning-color: #f97316;
+            --info-color: #60a5fa;
+
+            --border-radius-xl: 20px;
+            --border-radius-md: 12px;
+            --transition-speed: 0.3s;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: var(--font-primary);
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            display: flex;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+        .page-wrapper { display: flex; width: 100%; }
+
+        /* --- Sidebar Navigation (Consistent) --- */
+        .sidebar {
+            width: 280px;
+            background-color: var(--sidebar-bg);
+            color: var(--text-on-dark);
+            height: 100vh; padding: 24px;
+            display: flex; flex-direction: column;
+            position: fixed; top: 0; left: 0;
+            z-index: 1000;
+        }
+        .sidebar-header {
+            display: flex; align-items: center; gap: 12px;
+            margin-bottom: 48px; padding-left: 10px;
+        }
+        .sidebar-logo {
+            width: 44px; height: 44px;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            border-radius: var(--border-radius-md); display: flex; align-items: center;
+            justify-content: center; box-shadow: 0 4px 10px rgba(59, 130, 246, 0.4);
+        }
+        .sidebar-logo svg { color: #fff; }
+        .sidebar-header h1 { font-size: 24px; font-weight: 800; color: var(--text-on-dark); }
+        .sidebar-nav { flex-grow: 1; }
+        .sidebar-nav ul { list-style: none; }
+        .sidebar-nav ul li a {
+            display: flex; align-items: center; gap: 16px;
+            padding: 16px; margin-bottom: 8px; border-radius: var(--border-radius-md);
+            text-decoration: none; color: #9ca3af; font-weight: 600;
+            transition: all var(--transition-speed) ease;
+        }
+        .sidebar-nav ul li a:hover { background-color: rgba(255, 255, 255, 0.05); color: #fff; }
+        .sidebar-nav ul li a.active {
+            background-color: var(--accent-primary); color: #fff;
+            box-shadow: 0 4px 14px rgba(59, 130, 246, 0.3);
+        }
+        .sidebar-nav .icon { width: 24px; height: 24px; }
+        
+        /* --- Main Content --- */
+        .main-content {
+            margin-left: 280px;
+            width: calc(100% - 280px);
+            padding: 40px;
+        }
+
+        .page-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 32px;
+        }
+        .page-header h2 { font-size: 2rem; font-weight: 800; }
+        .page-header p { color: var(--text-secondary); margin-top: 4px; }
+        
+        .btn {
+            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+            padding: 12px 24px; border-radius: var(--border-radius-md); border: none;
+            font-size: 1rem; font-weight: 600; cursor: pointer;
+            transition: all 0.2s ease-out;
+            box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08);
+        }
+        .btn-primary { background-color: var(--accent-primary); color: #fff; }
+        .btn-danger { background-color: var(--danger-color); color: #fff; }
+
+        /* --- Settings Page Specific Styles --- */
+        .settings-layout {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 32px;
+        }
+        
+        .settings-nav a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 16px;
+            font-weight: 600;
+            border-radius: var(--border-radius-md);
+            margin-bottom: 8px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: all var(--transition-speed);
+        }
+        .settings-nav a:hover {
+            background-color: #f3f4f6;
+            color: var(--text-primary);
+        }
+        .settings-nav a.active {
+            background-color: #eef2ff;
+            color: var(--accent-primary);
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius-xl);
+            padding: 32px;
+            box-shadow: 0 10px 30px var(--shadow-color);
+        }
+        .card-header {
+            padding-bottom: 16px;
+            margin-bottom: 24px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .card-header h3 { font-size: 1.5rem; font-weight: 700; }
+        .card-header p { font-size: 1rem; color: var(--text-secondary); margin-top: 4px; }
+        .card-footer {
+            padding-top: 24px;
+            margin-top: 32px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-md);
+            font-size: 1rem;
+            font-family: var(--font-primary);
+            transition: box-shadow var(--transition-speed), border-color var(--transition-speed);
+        }
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px hsla(221, 83%, 53%, 0.2);
+        }
+        .form-group small {
+            display: block;
+            margin-top: 8px;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .toggle-switch {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 52px;
+            height: 28px;
+        }
+        .switch input { display: none; }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 28px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider { background-color: var(--accent-primary); }
+        input:checked + .slider:before { transform: translateX(24px); }
+        
+        .accordion-item {
+            border-bottom: 1px solid var(--border-color);
+        }
+        .accordion-header {
+            width: 100%;
+            background: none;
+            border: none;
+            padding: 20px 0;
+            text-align: left;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .accordion-icon {
+            transition: transform var(--transition-speed) ease;
+            color: var(--text-secondary);
+        }
+        .accordion-header.active .accordion-icon {
+            transform: rotate(180deg);
+        }
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease-out;
+        }
+        .accordion-content-inner {
+            padding: 0 0 24px 0;
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .sidebar { width: 80px; }
+            .sidebar-header h1, .sidebar-nav span { display: none; }
+            .sidebar-nav ul li a { justify-content: center; }
+            .main-content { margin-left: 80px; width: calc(100% - 80px); }
+            .settings-layout { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 768px) {
+            body { flex-direction: column; }
+            .sidebar { width: 100%; height: auto; position: static; flex-direction: row; }
+            .main-content { margin-left: 0; width: 100%; padding: 24px 16px; }
+            .page-header { flex-direction: column; align-items: flex-start; gap: 12px; }
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="page-wrapper">
+    <aside class="sidebar">
+        <!-- Sidebar content -->
+        <div class="sidebar-header">
+            <div class="sidebar-logo">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+            </div>
+            <h1>InjuryShield</h1>
+        </div>
+        <nav class="sidebar-nav">
+             <ul>
+                <li><a href="index.html"><svg class="icon" ...></svg> <span>Home</span></a></li>
+                <li><a href="dashboard.html"><svg class="icon" ...></svg> <span>Dashboard</span></a></li>
+                <li><a href="reports.html"><svg class="icon" ...></svg> <span>Reports</span></a></li>
+                <li><a href="history.html"><svg class="icon" ...></svg> <span>History</span></a></li>
+                <li><a href="cameras.html"><svg class="icon" ...></svg> <span>Cameras</span></a></li>
+                <li><a href="settings.html" class="active"><svg class="icon" ...></svg> <span>Settings</span></a></li>
+            </ul>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <header class="page-header">
+            <div>
+                <h2>System Settings</h2>
+                <p>Manage and configure system parameters, notifications, and user access.</p>
+            </div>
+        </header>
+
+        <div class="settings-layout">
+            <nav class="settings-nav">
+                <a href="#" class="active">General</a>
+                <a href="#">Notifications</a>
+                <a href="#">Camera Management</a>
+                <a href="#">User Access</a>
+                <a href="#">Billing</a>
+                <a href="#">API & Integrations</a>
+            </nav>
+
+            <div class="settings-content">
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <h3>General Settings</h3>
+                            <p>Update your site's details and preferences.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="site-name">Site Name</label>
+                        <input type="text" id="site-name" value="Main Production Facility">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="timezone">Timezone</label>
+                        <select id="timezone">
+                            <option value="gmt8" selected>(GMT+8:00) Kuala Lumpur, Singapore</option>
+                            <option value="gmt7">(GMT+7:00) Bangkok, Jakarta</option>
+                            <option value="gmt9">(GMT+9:00) Tokyo, Seoul</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Language</label>
+                        <select id="language">
+                            <option value="en" selected>English</option>
+                            <option value="ms">Bahasa Melayu</option>
+                        </select>
+                    </div>
+
+                    <div class="card-footer">
+                        <button class="btn btn-primary">Save Changes</button>
+                    </div>
+                </div>
+
+                <div class="card" style="margin-top: 24px;">
+                    <div class="card-header">
+                        <h3>Notification Settings</h3>
+                        <p>Configure how and when you receive alerts.</p>
+                    </div>
+                    
+                    <div class="accordion">
+                        <div class="accordion-item">
+                            <button class="accordion-header">
+                                <span>SMS Alerts</span>
+                                <svg class="accordion-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                            </button>
+                            <div class="accordion-content">
+                                <div class="accordion-content-inner">
+                                    <div class="form-group">
+                                        <div class="toggle-switch">
+                                            <label>Enable SMS Notifications</label>
+                                            <label class="switch"><input type="checkbox" checked><span class="slider"></span></label>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="sms-number">Recipient Phone Number</label>
+                                        <input type="tel" id="sms-number" value="+60 12-345 6789">
+                                        <small>Enter the number to receive critical alerts.</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="accordion-item">
+                            <button class="accordion-header">
+                                <span>Email Summaries</span>
+                                <svg class="accordion-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                            </button>
+                            <div class="accordion-content">
+                                <div class="accordion-content-inner">
+                                    <div class="form-group">
+                                        <div class="toggle-switch">
+                                            <label>Enable Daily Email Summary</label>
+                                            <label class="switch"><input type="checkbox" checked><span class="slider"></span></label>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="email-address">Recipient Email Address</label>
+                                        <input type="email" id="email-address" value="safety.officer@example.com.my">
+                                        <small>A daily report will be sent to this address at 8:00 AM.</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                     <div class="card-footer">
+                        <button class="btn btn-primary">Save Notification Settings</button>
+                    </div>
+                </div>
+
+                <div class="card" style="margin-top: 24px; border-color: var(--danger-color);">
+                    <div class="card-header" style="border-bottom: none;">
+                        <div>
+                            <h3>Danger Zone</h3>
+                            <p>Be careful with these actions as they are irreversible.</p>
+                        </div>
+                    </div>
+                    <div class="form-group" style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <strong>Delete All Historical Data</strong>
+                            <small>This will permanently erase all compliance logs and violation events.</small>
+                        </div>
+                        <button class="btn btn-danger">Delete Data</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+    /**
+     * Sets the 'active' class on the correct sidebar navigation link.
+     */
+    function handleActiveNavigation() {
+        const navLinks = document.querySelectorAll('.sidebar-nav a');
+        navLinks.forEach(link => {
+            link.classList.remove('active');
+            if (link.href.includes('settings.html')) {
+                link.classList.add('active');
+            }
+        });
+    }
+
+    /**
+     * Handles accordion functionality for expanding and collapsing content.
+     */
+    function initializeAccordions() {
+        const accordionHeaders = document.querySelectorAll('.accordion-header');
+
+        accordionHeaders.forEach(header => {
+            header.addEventListener('click', () => {
+                const content = header.nextElementSibling;
+                const icon = header.querySelector('.accordion-icon');
+                
+                header.classList.toggle('active');
+
+                if (content.style.maxHeight) {
+                    // Collapse
+                    content.style.maxHeight = null;
+                    if(icon) icon.style.transform = 'rotate(0deg)';
+                } else {
+                    // Expand
+                    content.style.maxHeight = content.scrollHeight + "px";
+                    if(icon) icon.style.transform = 'rotate(180deg)';
+                }
+            });
+        });
+    }
+
+    // --- Initializations ---
+    handleActiveNavigation();
+    initializeAccordions();
+});
+</script>
+
+</body>
+</html>

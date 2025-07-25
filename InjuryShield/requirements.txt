@@ -1,0 +1,21 @@
+# Core libraries for PPE detection and image processing
+ultralytics==8.1.0  # Or the specific version compatible with your YOLOv8 model
+opencv-python==4.9.0.80 # Or a recent stable version
+numpy==1.26.4       # Essential for numerical operations with image data
+Pillow==10.3.0      # Often a dependency for image processing libraries like ultralytics or for image loading
+logging             # Standard library, but explicitly listed for clarity
+cv2
+# Web framework for the dashboard
+Flask==2.3.2  # Or a recent stable version
+
+# Database ORM for Flask
+Flask-SQLAlchemy==3.1.1 # Or a recent stable version
+python-dotenv==1.0.1    # 
+
+
+# For SMS notifications
+twilio==8.10.0 # Or a recent stable version
+
+
+# For advanced analytics and plotting (Heatmaps)
+matplotlib==3.8.3 # Or a recent stable version
