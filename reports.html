@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - InjuryShield</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
+    <!-- CSS is now in the external style.css file -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="page-wrapper">
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+            </div>
+            <h1>InjuryShield</h1>
+        </div>
+        <nav class="sidebar-nav">
+             <ul>
+                <li><a href="index.html"><svg class="icon" ...></svg> <span>Home</span></a></li>
+                <li><a href="dashboard.html" class="active"><svg class="icon" ...></svg> <span>Dashboard</span></a></li>
+                <li><a href="reports.html"><svg class="icon" ...></svg> <span>Reports</span></a></li>
+                <li><a href="history.html"><svg class="icon" ...></svg> <span>History</span></a></li>
+                <li><a href="cameras.html"><svg class="icon" ...></svg> <span>Cameras</span></a></li>
+                <li><a href="settings.html"><svg class="icon" ...></svg> <span>Settings</span></a></li>
+            </ul>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <header class="page-header">
+            <div>
+                <h2>Dashboard</h2>
+                <p>Real-time safety overview and performance metrics.</p>
+            </div>
+            <button class="btn btn-primary">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                <span>Add Widget</span>
+            </button>
+        </header>
+
+        <div class="dashboard-layout">
+
+            <!-- KPI Cards - Now with IDs and placeholder text -->
+            <div class="card kpi-card">
+                <div class="icon-wrapper icon-success">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                </div>
+                <h3>Compliance Rate (24h)</h3>
+                <p class="value" id="kpi-compliance-rate">--%</p>
+                <div class="trend" id="kpi-compliance-trend">
+                    <span>Loading...</span>
+                </div>
+            </div>
+
+            <div class="card kpi-card">
+                <div class="icon-wrapper icon-danger">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+                </div>
+                <h3>Active Alerts (Today)</h3>
+                <p class="value" id="kpi-active-alerts">--</p>
+                <div class="trend" id="kpi-alerts-trend">
+                    <span>Loading...</span>
+                </div>
+            </div>
+
+            <div class="card kpi-card">
+                <div class="icon-wrapper icon-info">
+                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                </div>
+                <h3>Persons Monitored</h3>
+                <p class="value" id="kpi-persons-monitored">--</p>
+                <div class="trend" id="kpi-persons-trend">
+                    <span>Live Count</span>
+                </div>
+            </div>
+
+            <div class="card kpi-card">
+                 <div class="icon-wrapper" style="background-color: #eef2ff; color: #4338ca;">
+                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+                </div>
+                <h3>Active Cameras</h3>
+                <p class="value" id="kpi-active-cameras">--/--</p>
+                <div class="trend" id="kpi-cameras-trend">
+                    <span>Operational</span>
+                </div>
+            </div>
+            
+            <!-- Live Feed -->
+            <div class="card live-feed-card">
+                <div class="card-header">
+                    <h3 id="live-feed-camera-name">Loading Camera...</h3>
+                </div>
+                <div class="video-placeholder">
+                    <!-- The actual <img src="/video_feed"> would go here, this is a static placeholder -->
+                    <div class="video-overlay" id="live-feed-overlay" style="display: none;"> <!-- Hidden by default -->
+                        <div class="violation-alert">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                            <p><strong id="live-feed-violation-text">VIOLATION DETECTED</strong></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Alerts Table -->
+            <div class="card recent-alerts-card">
+                <div class="card-header">
+                    <h3>Recent Alerts</h3>
+                    <a href="history.html" style="font-weight: 600; font-size: 14px; color: var(--accent-primary);">View All</a>
+                </div>
+                <div class="data-table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Priority</th>
+                                <th>Event</th>
+                                <th>Camera</th>
+                                <th>Time</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recent-alerts-table-body">
+                            <!-- Placeholder row -->
+                            <tr>
+                                <td colspan="4" style="text-align: center; color: var(--text-secondary); padding: 40px 0;">Loading recent alerts...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- System Health -->
+            <div class="card system-health-card">
+                 <div class="card-header"><h3>System Health</h3></div>
+                 <div class="health-item">
+                     <div class="health-item-header"><span>Model Performance</span><strong id="health-fps">-- FPS</strong></div>
+                     <div class="progress-bar"><div class="progress-bar-inner success" id="health-fps-bar" style="width: 0%;"></div></div>
+                 </div>
+                 <div class="health-item">
+                     <div class="health-item-header"><span>Database Connectivity</span><strong id="health-db-status">--</strong></div>
+                     <div class="progress-bar"><div class="progress-bar-inner success" id="health-db-bar" style="width: 0%;"></div></div>
+                 </div>
+                  <div class="health-item">
+                     <div class="health-item-header"><span>Server CPU Load</span><strong id="health-cpu-load">--%</strong></div>
+                     <div class="progress-bar"><div class="progress-bar-inner warning" id="health-cpu-bar" style="width: 0%;"></div></div>
+                 </div>
+            </div>
+
+            <!-- Calendar -->
+            <div class="card calendar-card">
+                 <div class="card-header">
+                     <h3 id="month-year">Loading...</h3>
+                 </div>
+                 <div class="calendar-body" id="calendar-body">
+                    <!-- Calendar will be populated by JS -->
+                 </div>
+            </div>
+
+        </div>
+    </main>
+</div>
+
+<!-- All logic is now in the external script.js file -->
+<script src="js/script.js"></script>
+
+</body>
+</html>

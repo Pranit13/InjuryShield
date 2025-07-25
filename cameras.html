@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Monitoring - InjuryShield</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <style>
+        /* --- Global Styles & CSS Variables (Consistent) --- */
+        :root {
+            --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            --bg-color: #f7f8fc;
+            --sidebar-bg: #111827;
+            --card-bg: #ffffff;
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --text-on-dark: #f9fafb;
+            --accent-primary: #3b82f6;
+            --accent-secondary: #2563eb;
+            --border-color: #e5e7eb;
+            --shadow-color: rgba(99, 102, 241, 0.1);
+            --danger-color: #ef4444;
+            --success-color: #22c55e;
+            --warning-color: #f97316;
+            --info-color: #60a5fa;
+
+            --border-radius-xl: 20px;
+            --border-radius-md: 12px;
+            --transition-speed: 0.3s;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: var(--font-primary);
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            display: flex;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+        .page-wrapper { display: flex; width: 100%; }
+
+        /* --- Sidebar Navigation (Consistent) --- */
+        .sidebar {
+            width: 280px;
+            background-color: var(--sidebar-bg);
+            color: var(--text-on-dark);
+            height: 100vh; padding: 24px;
+            display: flex; flex-direction: column;
+            position: fixed; top: 0; left: 0;
+            z-index: 1000;
+        }
+        .sidebar-header {
+            display: flex; align-items: center; gap: 12px;
+            margin-bottom: 48px; padding-left: 10px;
+        }
+        .sidebar-logo {
+            width: 44px; height: 44px;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            border-radius: var(--border-radius-md); display: flex; align-items: center;
+            justify-content: center; box-shadow: 0 4px 10px rgba(59, 130, 246, 0.4);
+        }
+        .sidebar-logo svg { color: #fff; }
+        .sidebar-header h1 { font-size: 24px; font-weight: 800; color: var(--text-on-dark); }
+        .sidebar-nav { flex-grow: 1; }
+        .sidebar-nav ul { list-style: none; }
+        .sidebar-nav ul li a {
+            display: flex; align-items: center; gap: 16px;
+            padding: 16px; margin-bottom: 8px; border-radius: var(--border-radius-md);
+            text-decoration: none; color: #9ca3af; font-weight: 600;
+            transition: all var(--transition-speed) ease;
+        }
+        .sidebar-nav ul li a:hover { background-color: rgba(255, 255, 255, 0.05); color: #fff; }
+        .sidebar-nav ul li a.active {
+            background-color: var(--accent-primary); color: #fff;
+            box-shadow: 0 4px 14px rgba(59, 130, 246, 0.3);
+        }
+        .sidebar-nav .icon { width: 24px; height: 24px; }
+        
+        /* --- Main Content --- */
+        .main-content {
+            margin-left: 280px;
+            width: calc(100% - 280px);
+            padding: 40px;
+        }
+
+        .page-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 32px;
+        }
+        .page-header h2 { font-size: 2rem; font-weight: 800; }
+        .page-header p { color: var(--text-secondary); margin-top: 4px; }
+        
+        .btn {
+            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+            padding: 12px 24px; border-radius: var(--border-radius-md); border: none;
+            font-size: 1rem; font-weight: 600; cursor: pointer;
+            transition: all 0.2s ease-out;
+            box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08);
+        }
+        .btn-primary { background-color: var(--accent-primary); color: #fff; }
+
+        /* --- Cameras Page Specific Styles --- */
+        .monitoring-layout {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 24px;
+            height: calc(100vh - 150px); /* Adjust based on header height */
+        }
+        
+        .main-view-panel {
+            grid-column: 1 / 2;
+            grid-row: 1 / 2;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .right-sidebar {
+            grid-column: 2 / 3;
+            grid-row: 1 / 2;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            max-height: 100%;
+        }
+        
+        .card {
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius-xl);
+            padding: 24px;
+            box-shadow: 0 10px 30px var(--shadow-color);
+            display: flex;
+            flex-direction: column;
+        }
+        .card-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .card-header h3 { font-size: 1.25rem; font-weight: 700; }
+        
+        .view-toggle {
+            display: flex; background: #eef2ff; border-radius: var(--border-radius-md); padding: 4px;
+        }
+        .view-toggle button {
+            background: transparent; border: none; padding: 8px 16px;
+            cursor: pointer; border-radius: 10px; font-weight: 600;
+            color: var(--text-secondary); transition: all var(--transition-speed);
+        }
+        .view-toggle button.active {
+            background: #fff; color: var(--accent-primary);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .camera-grid-view {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+        }
+        
+        .focus-view-container, .camera-grid-view {
+            flex-grow: 1;
+        }
+
+        .camera-card {
+            aspect-ratio: 16 / 10;
+            padding: 0;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            border-radius: var(--border-radius-xl);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.05);
+            transition: all var(--transition-speed) ease;
+        }
+        .camera-card:hover { transform: translateY(-5px); box-shadow: 0 12px 30px rgba(0,0,0,0.1); }
+        .camera-card img { width: 100%; height: 100%; object-fit: cover; }
+        .camera-card .overlay {
+            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.8), transparent 60%);
+            color: #fff; display: flex; flex-direction: column;
+            justify-content: flex-end; padding: 16px;
+        }
+        .overlay h5 { font-size: 1rem; font-weight: 600; }
+        .overlay span { font-size: 0.8rem; opacity: 0.8; }
+        .overlay .status-dot {
+            position: absolute; top: 16px; left: 16px; width: 12px; height: 12px;
+            border-radius: 50%; border: 2px solid #fff;
+        }
+        
+        .dot-compliant { background-color: var(--success-color); }
+        .dot-violation { background-color: var(--danger-color); }
+        .dot-offline { background-color: #9ca3af; }
+        
+        .focus-view-card {
+             height: 100%;
+        }
+        .focus-image-container {
+             flex-grow: 1; background-color: #000;
+             border-radius: var(--border-radius-md);
+             background-size: cover;
+             background-position: center;
+        }
+
+        .system-status-list, .events-list {
+            flex-grow: 1;
+            overflow-y: auto;
+        }
+        .health-item, .event-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 14px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .health-item:last-child, .event-item:last-child { border-bottom: none; }
+        
+        .progress-container { flex-grow: 1; }
+        .progress-bar { width: 100%; height: 8px; background-color: var(--border-color); border-radius: 4px; overflow: hidden; }
+        .progress-bar-inner { height: 100%; border-radius: 4px; transition: width 0.5s ease; }
+        .progress-bar-inner.success { background-color: var(--success-color); }
+        .progress-bar-inner.warning { background-color: var(--warning-color); }
+
+        .event-icon {
+            width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center;
+            justify-content: center; flex-shrink: 0;
+        }
+        .icon-danger { background-color: #fee2e2; color: #b91c1c; }
+        .icon-warning { background-color: #ffedd5; color: #9a3412; }
+        .icon-info { background-color: #dbeafe; color: #1e40af; }
+
+        .event-content p { font-weight: 600; font-size: 14px; line-height: 1.4; margin: 0 0 2px 0; }
+        .event-content span { font-size: 12px; color: var(--text-secondary); }
+        
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .monitoring-layout {
+                grid-template-columns: 1fr;
+                height: auto;
+            }
+            .right-sidebar { grid-row: 2; display: grid; grid-template-columns: 1fr 1fr; }
+        }
+        @media (max-width: 992px) {
+            .sidebar { width: 80px; }
+            .sidebar-header h1, .sidebar-nav span { display: none; }
+            .sidebar-nav ul li a { justify-content: center; }
+            .main-content { margin-left: 80px; width: calc(100% - 80px); }
+        }
+         @media (max-width: 768px) {
+            body { flex-direction: column; }
+            .sidebar { width: 100%; height: auto; position: static; flex-direction: row; }
+            .main-content { margin-left: 0; width: 100%; padding: 24px 16px; }
+            .right-sidebar { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="page-wrapper">
+    <aside class="sidebar">
+        <!-- Sidebar content -->
+        <div class="sidebar-header">
+            <div class="sidebar-logo">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+            </div>
+            <h1>InjuryShield</h1>
+        </div>
+        <nav class="sidebar-nav">
+             <ul>
+                <li><a href="index.html"><svg class="icon" ...></svg> <span>Home</span></a></li>
+                <li><a href="dashboard.html"><svg class="icon" ...></svg> <span>Dashboard</span></a></li>
+                <li><a href="reports.html"><svg class="icon" ...></svg> <span>Reports</span></a></li>
+                <li><a href="history.html"><svg class="icon" ...></svg> <span>History</span></a></li>
+                <li><a href="cameras.html" class="active"><svg class="icon" ...></svg> <span>Cameras</span></a></li>
+                <li><a href="settings.html"><svg class="icon" ...></svg> <span>Settings</span></a></li>
+            </ul>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <header class="page-header">
+            <div>
+                <h2>Live Camera Monitoring</h2>
+                <p>Real-time feeds from all operational cameras. Select a view mode.</p>
+            </div>
+            <div class="view-toggle">
+                <button id="focus-view-btn" class="active">Focus View</button>
+                <button id="grid-view-btn">Grid View</button>
+            </div>
+        </header>
+
+        <div class="monitoring-layout">
+            <div class="main-view-panel">
+                <div class="focus-view-container card" id="focus-view-container">
+                     <div class="card-header">
+                        <h3 id="focus-camera-name"></h3>
+                        <span class="status-badge" id="focus-camera-status"></span>
+                    </div>
+                    <div class="focus-image-container" id="focus-camera-image"></div>
+                </div>
+                <div class="camera-grid-view" id="camera-grid-container" style="display: none;">
+                    <!-- Grid cards will be populated here by JS -->
+                </div>
+            </div>
+
+            <div class="right-sidebar">
+                <div class="card">
+                    <div class="card-header">
+                        <h3>System Status</h3>
+                    </div>
+                    <div class="system-status-list">
+                         <div class="health-item">
+                            <div class="progress-container">
+                                <div style="font-weight: 600; margin-bottom: 8px;">Model Performance</div>
+                                <div class="progress-bar"><div class="progress-bar-inner success" style="width: 95%;"></div></div>
+                            </div>
+                            <strong style="font-size: 1.1rem;">28 FPS</strong>
+                        </div>
+                        <div class="health-item">
+                            <div class="progress-container">
+                                <div style="font-weight: 600; margin-bottom: 8px;">Online Cameras</div>
+                                <div class="progress-bar"><div class="progress-bar-inner success" style="width: 83%;"></div></div>
+                            </div>
+                             <strong style="font-size: 1.1rem;">5/6</strong>
+                        </div>
+                    </div>
+                </div>
+                <div class="card" style="flex-grow: 1;">
+                    <div class="card-header">
+                        <h3>Recent Events</h3>
+                    </div>
+                    <div class="events-list" id="events-container">
+                        <!-- Event items will be populated here by JS -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    
+    // --- Data Simulation ---
+    const cameraData = [
+        { id: 1, name: 'Main Production Line', section: 'Production', status: 'compliant', image: 'https://images.unsplash.com/photo-1621905251189-08b45d6a269e?q=80&w=800&auto=format&fit=crop', alerts: 0 },
+        { id: 2, name: 'Warehouse Entrance', section: 'Logistics', status: 'compliant', image: 'https://images.unsplash.com/photo-1586528116311-08dd4c7f12da?q=80&w=800&auto=format&fit=crop', alerts: 0 },
+        { id: 3, name: 'Stamping Press Area', section: 'Production', status: 'violation', image: 'https://images.unsplash.com/photo-1560264280-88b68371db39?q=80&w=800&auto=format&fit=crop', alerts: 1 },
+        { id: 4, name: 'Loading Bay #2', section: 'Logistics', status: 'offline', image: 'https://images.unsplash.com/photo-1587293852726-70cdb121d176?q=80&w=800&auto=format&fit=crop', alerts: 0 },
+        { id: 5, name: 'Assembly Line B', section: 'Production', status: 'compliant', image: 'https://images.unsplash.com/photo-1558992299-73b28b6b3671?q=80&w=800&auto=format&fit=crop', alerts: 0 },
+        { id: 6, name: 'Quality Control Lab', section: 'Labs', status: 'compliant', image: 'https://images.unsplash.com/photo-1518152006812-edab29b069ac?q=80&w=800&auto=format&fit=crop', alerts: 0 }
+    ];
+
+    const eventsData = [
+        { type: 'danger', message: 'No Helmet detected', camera: 'CAM-03', time: '2m ago' },
+        { type: 'info', message: 'Person entered restricted zone', camera: 'CAM-02', time: '5m ago' },
+        { type: 'warning', message: 'Camera feed intermittent', camera: 'CAM-04', time: '12m ago' },
+        { type: 'danger', message: 'No Vest detected near forklift', camera: 'CAM-02', time: '28m ago' },
+    ];
+
+    // --- DOM Element References ---
+    const focusViewBtn = document.getElementById('focus-view-btn');
+    const gridViewBtn = document.getElementById('grid-view-btn');
+    const focusViewContainer = document.getElementById('focus-view-container');
+    const cameraGridContainer = document.getElementById('camera-grid-container');
+    const focusCameraName = document.getElementById('focus-camera-name');
+    const focusCameraStatus = document.getElementById('focus-camera-status');
+    const focusCameraImage = document.getElementById('focus-camera-image');
+    const eventsContainer = document.getElementById('events-container');
+
+    // --- Icon Map ---
+    const iconMap = {
+        danger: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>`,
+        warning: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>`,
+        info: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>`
+    };
+
+    /**
+     * Renders the grid of camera cards.
+     */
+    function renderCameraGrid() {
+        cameraGridContainer.innerHTML = cameraData.map(cam => `
+            <div class="card camera-card" data-camera-id="${cam.id}">
+                <img src="${cam.image}" alt="${cam.name}">
+                <div class="overlay">
+                    <div class="status-dot dot-${cam.status}"></div>
+                    <div>
+                        <h5>${cam.name.split(': ')[1]}</h5>
+                        <span>${cam.section}</span>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    /**
+     * Updates the main focus view with data from a specific camera.
+     * @param {number} cameraId - The ID of the camera to focus on.
+     */
+    function setFocusView(cameraId) {
+        const cam = cameraData.find(c => c.id === cameraId);
+        if (!cam) return;
+
+        focusCameraName.textContent = cam.name;
+        focusCameraImage.style.backgroundImage = `url('${cam.image}')`;
+        focusCameraStatus.textContent = cam.status.toUpperCase();
+        focusCameraStatus.className = `status-badge status-${cam.status}`;
+        focusCameraStatus.innerHTML = `<span class="dot dot-${cam.status}"></span> ${cam.status.toUpperCase()}`;
+    }
+
+    /**
+     * Populates the recent events list.
+     */
+    function renderEvents() {
+        eventsContainer.innerHTML = eventsData.map(event => `
+            <div class="event-item">
+                <div class="event-icon icon-${event.type}">
+                    ${iconMap[event.type]}
+                </div>
+                <div class="event-content">
+                    <p>${event.message}</p>
+                    <span>${event.camera} • ${event.time}</span>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    /**
+     * Event Listeners for View Toggling.
+     */
+    focusViewBtn.addEventListener('click', () => {
+        focusViewContainer.style.display = 'flex';
+        cameraGridContainer.style.display = 'none';
+        focusViewBtn.classList.add('active');
+        gridViewBtn.classList.remove('active');
+    });
+
+    gridViewBtn.addEventListener('click', () => {
+        focusViewContainer.style.display = 'none';
+        cameraGridContainer.style.display = 'grid';
+        gridViewBtn.classList.add('active');
+        focusViewBtn.classList.remove('active');
+    });
+
+    cameraGridContainer.addEventListener('click', (e) => {
+        const card = e.target.closest('.camera-card');
+        if (card) {
+            const camId = parseInt(card.dataset.cameraId, 10);
+            setFocusView(camId);
+            focusViewBtn.click(); // Switch to focus view
+        }
+    });
+    
+    /**
+     * Sets the active state for the sidebar navigation.
+     */
+    function handleActiveNavigation() {
+        document.querySelectorAll('.sidebar-nav a').forEach(link => {
+            link.classList.remove('active');
+            if (link.href.includes('cameras.html')) {
+                link.classList.add('active');
+            }
+        });
+    }
+
+    // --- Initial Page Load ---
+    handleActiveNavigation();
+    renderEvents();
+    renderCameraGrid();
+    setFocusView(3); // Start by focusing on the camera with a violation.
+    focusViewBtn.click(); // Ensure focus view is active on load.
+});
+</script>
+
+</body>
+</html>

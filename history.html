@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data History - InjuryShield</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <style>
+        /* --- Global Styles & CSS Variables (Consistent) --- */
+        :root {
+            --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            --bg-color: #f7f8fc;
+            --sidebar-bg: #111827;
+            --card-bg: #ffffff;
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --text-on-dark: #f9fafb;
+            --accent-primary: #3b82f6;
+            --accent-secondary: #2563eb;
+            --border-color: #e5e7eb;
+            --shadow-color: rgba(99, 102, 241, 0.1);
+            --danger-color: #ef4444;
+            --success-color: #22c55e;
+            --warning-color: #f97316;
+            --info-color: #60a5fa;
+
+            --border-radius-xl: 20px;
+            --border-radius-md: 12px;
+            --transition-speed: 0.3s;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: var(--font-primary);
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            display: flex;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+        .page-wrapper { display: flex; width: 100%; }
+
+        /* --- Sidebar Navigation (Consistent) --- */
+        .sidebar {
+            width: 280px;
+            background-color: var(--sidebar-bg);
+            color: var(--text-on-dark);
+            height: 100vh; padding: 24px;
+            display: flex; flex-direction: column;
+            position: fixed; top: 0; left: 0;
+            z-index: 1000;
+        }
+        /* ... (rest of sidebar styles are identical to other pages) ... */
+        .sidebar-header {
+            display: flex; align-items: center; gap: 12px;
+            margin-bottom: 48px; padding-left: 10px;
+        }
+        .sidebar-logo {
+            width: 44px; height: 44px;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            border-radius: var(--border-radius-md); display: flex; align-items: center;
+            justify-content: center; box-shadow: 0 4px 10px rgba(59, 130, 246, 0.4);
+        }
+        .sidebar-logo svg { color: #fff; }
+        .sidebar-header h1 { font-size: 24px; font-weight: 800; color: var(--text-on-dark); }
+        .sidebar-nav { flex-grow: 1; }
+        .sidebar-nav ul { list-style: none; }
+        .sidebar-nav ul li a {
+            display: flex; align-items: center; gap: 16px;
+            padding: 16px; margin-bottom: 8px; border-radius: var(--border-radius-md);
+            text-decoration: none; color: #9ca3af; font-weight: 600;
+            transition: all var(--transition-speed) ease;
+        }
+        .sidebar-nav ul li a:hover { background-color: rgba(255, 255, 255, 0.05); color: #fff; }
+        .sidebar-nav ul li a.active {
+            background-color: var(--accent-primary); color: #fff;
+            box-shadow: 0 4px 14px rgba(59, 130, 246, 0.3);
+        }
+        .sidebar-nav .icon { width: 24px; height: 24px; }
+        
+        /* --- Main Content --- */
+        .main-content {
+            margin-left: 280px;
+            width: calc(100% - 280px);
+            padding: 40px;
+        }
+
+        .page-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 32px;
+        }
+        .page-header h2 { font-size: 2rem; font-weight: 800; }
+        .page-header p { color: var(--text-secondary); margin-top: 4px; }
+        
+        .btn {
+            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+            padding: 12px 24px; border-radius: var(--border-radius-md); border: none;
+            font-size: 1rem; font-weight: 600; cursor: pointer;
+            transition: all 0.2s ease-out;
+            box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08);
+        }
+        .btn-primary { background-color: var(--accent-primary); color: #fff; }
+        
+        /* --- History Page Specific Styles --- */
+        .card {
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius-xl);
+            padding: 24px;
+            box-shadow: 0 10px 30px var(--shadow-color);
+        }
+
+        .table-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .search-bar {
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+        }
+        .search-bar input {
+            width: 100%;
+            padding: 12px 16px 12px 44px;
+            border-radius: var(--border-radius-md);
+            border: 1px solid var(--border-color);
+            font-size: 1rem;
+            transition: box-shadow var(--transition-speed);
+        }
+        .search-bar input:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px hsla(221, 83%, 53%, 0.2);
+        }
+        .search-bar .icon {
+            position: absolute;
+            top: 50%;
+            left: 16px;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+        }
+
+        .filters { display: flex; gap: 12px; }
+        .filter-btn {
+            background: #fff; border: 1px solid var(--border-color); color: var(--text-primary);
+            padding: 10px 16px;
+        }
+        
+        .data-table-container { overflow-x: auto; }
+        .data-table { width: 100%; border-collapse: collapse; }
+        .data-table th, .data-table td {
+            padding: 16px; text-align: left;
+            border-bottom: 1px solid var(--border-color);
+            white-space: nowrap;
+        }
+        .data-table th {
+            font-size: 12px; font-weight: 600;
+            color: var(--text-secondary); text-transform: uppercase;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+        }
+        .data-table th:hover { color: var(--text-primary); }
+        .data-table tbody tr { transition: background-color var(--transition-speed); }
+        .data-table tbody tr:hover { background-color: #f9fafb; }
+        .data-table td { font-weight: 500; }
+        
+        .status-badge {
+            padding: 6px 12px; border-radius: 20px;
+            font-weight: 600; font-size: 12px;
+            display: inline-flex; align-items: center; gap: 6px;
+        }
+        .status-badge .dot { width: 8px; height: 8px; border-radius: 50%; }
+        .status-high { background-color: #fee2e2; color: #b91c1c; }
+        .dot-high { background-color: var(--danger-color); }
+        .status-medium { background-color: #ffedd5; color: #9a3412; }
+        .dot-medium { background-color: var(--warning-color); }
+        .status-low { background-color: #dbeafe; color: #1e40af; }
+        .dot-low { background-color: var(--info-color); }
+        .status-resolved { background-color: #dcfce7; color: #166534; }
+        .dot-resolved { background-color: var(--success-color); }
+        
+        .table-pagination {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 24px;
+        }
+        .pagination-info { font-size: 14px; color: var(--text-secondary); }
+        .pagination-controls button {
+            background-color: #fff;
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            font-weight: 600;
+            padding: 8px 16px;
+            border-radius: var(--border-radius-md);
+            cursor: pointer;
+            margin-left: 8px;
+        }
+        .pagination-controls button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        /* Responsive */
+        @media (max-width: 992px) {
+            .sidebar { width: 80px; }
+            .sidebar-header h1, .sidebar-nav span { display: none; }
+            .sidebar-nav ul li a { justify-content: center; }
+            .main-content { margin-left: 80px; width: calc(100% - 80px); }
+        }
+        @media (max-width: 768px) {
+            body { flex-direction: column; }
+            .sidebar { width: 100%; height: auto; position: static; flex-direction: row; }
+            .main-content { margin-left: 0; width: 100%; padding: 24px 16px; }
+            .table-controls { flex-direction: column; gap: 16px; align-items: stretch; }
+            .search-bar { max-width: 100%; }
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="page-wrapper">
+    <aside class="sidebar">
+        <!-- Sidebar content -->
+        <div class="sidebar-header">
+            <div class="sidebar-logo">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+            </div>
+            <h1>InjuryShield</h1>
+        </div>
+        <nav class="sidebar-nav">
+             <ul>
+                <li><a href="index.html"><svg class="icon" ...></svg> <span>Home</span></a></li>
+                <li><a href="dashboard.html"><svg class="icon" ...></svg> <span>Dashboard</span></a></li>
+                <li><a href="reports.html"><svg class="icon" ...></svg> <span>Reports</span></a></li>
+                <li><a href="history.html" class="active"><svg class="icon" ...></svg> <span>History</span></a></li>
+                <li><a href="cameras.html"><svg class="icon" ...></svg> <span>Cameras</span></a></li>
+                <li><a href="settings.html"><svg class="icon" ...></svg> <span>Settings</span></a></li>
+            </ul>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <header class="page-header">
+            <div>
+                <h2>Event History & Data Logs</h2>
+                <p>Search, filter, and review a detailed audit trail of all detected events.</p>
+            </div>
+            <button class="btn btn-primary">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                <span>Export Data</span>
+            </button>
+        </header>
+
+        <div class="card">
+            <div class="table-controls">
+                <div class="search-bar">
+                    <svg class="icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    <input type="text" placeholder="Search by event type, camera, or date...">
+                </div>
+                <div class="filters">
+                    <button class="btn btn-secondary">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+                        <span>Filter</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="data-table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Event ID</th>
+                            <th>Timestamp</th>
+                            <th>Event Type</th>
+                            <th>Priority</th>
+                            <th>Location / Camera</th>
+                            <th>Details</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="history-table-body">
+                        <!-- Rows will be populated by JS -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="table-pagination">
+                <span class="pagination-info">Showing 1-10 of 1,245 events</span>
+                <div class="pagination-controls">
+                    <button>Previous</button>
+                    <button>Next</button>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+    /**
+     * Sets the 'active' class on the correct sidebar navigation link.
+     */
+    function handleActiveNavigation() {
+        const navLinks = document.querySelectorAll('.sidebar-nav a');
+        navLinks.forEach(link => {
+            link.classList.remove('active');
+            if (link.href.includes('history.html')) {
+                link.classList.add('active');
+            }
+        });
+    }
+
+    /**
+     * Renders the historical data table.
+     */
+    function renderHistoryTable() {
+        const tableBody = document.getElementById('history-table-body');
+        if (!tableBody) return;
+
+        const historyData = [
+            { id: 'EVT-0981', timestamp: '2023-10-27 15:12:45', type: 'No Helmet', priority: 'High', location: 'CAM-03 (Stamping Press)', details: 'Confidence: 94%', status: 'Unresolved' },
+            { id: 'EVT-0980', timestamp: '2023-10-27 14:30:10', type: 'No Vest', priority: 'Medium', location: 'CAM-02 (Warehouse)', details: 'Confidence: 89%', status: 'Unresolved' },
+            { id: 'EVT-0979', timestamp: '2023-10-27 11:05:01', type: 'Zone Breach', priority: 'Medium', location: 'CAM-02 (Warehouse)', details: 'Restricted Area Entry', status: 'Resolved' },
+            { id: 'EVT-0978', timestamp: '2023-10-26 16:55:18', type: 'No Helmet', priority: 'High', location: 'CAM-01 (Prod Line)', details: 'Confidence: 91%', status: 'Resolved' },
+            { id: 'EVT-0977', timestamp: '2023-10-26 14:20:05', type: 'No Gloves', priority: 'Low', location: 'CAM-01 (Prod Line)', details: 'Confidence: 96%', status: 'Resolved' },
+            { id: 'EVT-0976', timestamp: '2023-10-26 10:01:30', type: 'System Alert', priority: 'Low', location: 'System-Wide', details: 'Database backup complete', status: 'Resolved' },
+            { id: 'EVT-0975', timestamp: '2023-10-25 15:45:11', type: 'No Helmet', priority: 'High', location: 'CAM-03 (Stamping Press)', details: 'Confidence: 95%', status: 'Unresolved' },
+            { id: 'EVT-0974', timestamp: '2023-10-25 09:12:00', type: 'No Vest', priority: 'Medium', location: 'CAM-04 (Loading Bay)', details: 'Confidence: 85%', status: 'Resolved' },
+        ];
+        
+        const priorityClasses = { 'High': 'high', 'Medium': 'medium', 'Low': 'low' };
+        const statusClasses = { 'Resolved': 'resolved', 'Unresolved': 'high' }; // Re-use 'high' class for unresolved to show red
+
+        tableBody.innerHTML = historyData.map(item => `
+            <tr>
+                <td><strong>${item.id}</strong></td>
+                <td>${item.timestamp}</td>
+                <td>${item.type}</td>
+                <td><span class="status-badge status-${priorityClasses[item.priority]}"><span class="dot dot-${priorityClasses[item.priority]}"></span>${item.priority}</span></td>
+                <td>${item.location}</td>
+                <td>${item.details}</td>
+                <td>
+                   <span class="status-badge status-${statusClasses[item.status]}">
+                        ${item.status}
+                   </span>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    // --- Initializations ---
+    handleActiveNavigation();
+    renderHistoryTable();
+
+});
+</script>
+
+</body>
+</html>

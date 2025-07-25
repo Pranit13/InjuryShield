@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}InjuryShield Dashboard{% endblock %}</title>
+    <!-- Link to external CSS file for styling -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <!-- Block for additional head content like meta tags or specific CSS/JS -->
+    {% block head %}{% endblock %}
+</head>
+<body>
+    <header>
+        <h1>InjuryShield PPE Monitoring System</h1>
+        <nav>
+            <ul>
+                <li><a href="/">Dashboard</a></li>
+                <!-- New navigation link for history -->
+                <li><a href="/history">History & Reports</a></li>
+                <!-- Future navigation links for settings, etc. -->
+                <!-- <li><a href="/settings">Settings</a></li> -->
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <!-- This is where the content of specific pages (like index.html) will be inserted -->
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer>
+        <p>© {{ moment().format('YYYY') if moment else '2023' }} InjuryShield. All rights reserved.</p>
+        <!-- Include moment.js for date formatting in templates -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+    </footer>
+
+    <!-- Block for additional JavaScript files at the end of the body -->
+    {% block scripts %}{% endblock %}
+</body>
+</html>

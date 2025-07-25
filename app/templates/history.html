@@ -1,0 +1,340 @@
+{% extends "base.html" %}
+
+{% block title %}History & Reports{% endblock %}
+
+{% block head %}
+    <style>
+        /* Specific styles for tables on the history page */
+        .data-section {
+            margin-bottom: 40px;
+        }
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        .data-table th, .data-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+            vertical-align: top; /* Align content to top for cells with more text */
+        }
+        .data-table th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+            color: #333;
+        }
+        .data-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .data-table tr:hover {
+            background-color: #f1f1f1;
+        }
+        .status-compliant {
+            color: green;
+            font-weight: bold;
+        }
+        .status-violations {
+            color: red;
+            font-weight: bold;
+        }
+        .status-unknown {
+            color: orange;
+            font-weight: bold;
+        }
+
+        /* Analytics specific styles */
+        .analytics-charts {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: space-around;
+            margin-top: 30px;
+        }
+        .chart-container {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.05);
+            padding: 20px;
+            flex: 1;
+            min-width: 45%; /* Two columns */
+            box-sizing: border-box; /* Include padding in width */
+            text-align: center;
+        }
+        .chart-container img {
+            max-width: 100%;
+            height: auto;
+            display: block; /* Remove extra space below image */
+            margin: 0 auto;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <h2>Historical Compliance Logs & Reports</h2>
+
+    <div class="data-section">
+        <h3>Recent Compliance Overview</h3>
+        {% if compliance_logs %}
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Timestamp</th>
+                    <th>Persons</th>
+                    <th>PPE Worn</th>
+                    <th>Violations</th>
+                    <th>Status</th>
+                    <th>Snapshot</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for log in compliance_logs %}
+                <tr>
+                    <td>{{ log.id }}</td>
+                    <td>{{ moment(log.timestamp).format('YYYY-MM-DD HH:mm:ss') }}</td>
+                    <td>{{ log.person_count }}</td>
+                    <td>{{ log.ppe_worn_count }}</td>
+                    <td>{{ log.violations_count }}</td>
+                    <td class="{% if 'Violation' in log.status %}status-violations{% elif log.violations_count == 0 %}status-compliant{% else %}status-unknown{% endif %}">
+                        {{ log.status }}
+                    </td>
+                    <td>
+                        {% if log.frame_snapshot_path %}
+                            <a href="{{ url_for('static', filename=log.frame_snapshot_path) }}" target="_blank">View Snapshot</a>
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+            <p>No compliance logs available yet. Start the monitoring dashboard to generate data.</p>
+        {% endif %}
+    </div>
+
+    <div class="data-section">
+        <h3>Recent Violation Events</h3>
+        {% if violation_events %}
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Log ID</th>
+                    <th>Timestamp</th>
+                    <th>Violation Type</th>
+                    <th>Location (Box)</th>
+                    <th>Confidence</th>
+                    <th>Severity</th>
+                    <th>Resolved</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for event in violation_events %}
+                <tr>
+                    <td>{{ event.id }}</td>
+                    <td>{{ event.log_id }}</td>
+                    <td>{{ moment(event.timestamp).format('YYYY-MM-DD HH:mm:ss') }}</td>
+                    <td>{{ event.violation_type }}</td>
+                    <td>{{ event.location_box if event.location_box else 'N/A' }}</td>
+                    <td>{{ '%.2f' % event.confidence if event.confidence else 'N/A' }}</td>
+                    <td>{{ event.severity }}</td>
+                    <td>{{ 'Yes' if event.is_resolved else 'No' }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+            <p>No violation events available yet.</p>
+        {% endif %}
+    </div>
+
+    <div class="data-section analytics-charts">
+        <div class="chart-container">
+            <h3>Violation Hotspot Heatmap</h3>
+            {% if heatmap_url %}
+                <img src="{{ heatmap_url }}" alt="Violation Heatmap">
+            {% else %}
+                <p>Heatmap could not be generated. Ensure there is violation data.</p>
+            {% endif %}
+        </div>
+
+        <div class="chart-container">
+            <h3>Hourly Violation Trends (Last 7 Days)</h3>
+            {% if hourly_trends %}
+                <canvas id="hourlyViolationChart" width="400" height="250"></canvas>
+            {% else %}
+                <p>No hourly violation data available.</p>
+            {% endif %}
+        </div>
+
+        <div class="chart-container">
+            <h3>Daily Compliance Rate (Last 30 Days)</h3>
+            {% if daily_summary %}
+                <canvas id="dailyComplianceChart" width="400" height="250"></canvas>
+            {% else %}
+                <p>No daily compliance data available.</p>
+            {% endif %}
+        </div>
+
+        <div class="chart-container">
+            <h3>Violation Type Distribution (Last 30 Days)</h3>
+            {% if violation_type_dist %}
+                <canvas id="violationTypeDistChart" width="400" height="250"></canvas>
+            {% else %}
+                <p>No violation type distribution data available.</p>
+            {% endif %}
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block scripts %}
+    <!-- Chart.js for drawing dynamic charts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.0/dist/chart.min.js"></script>
+    <script>
+        // Data passed from Flask to JavaScript for Chart.js
+        const hourlyTrends = JSON.parse('{{ hourly_trends | tojson }}');
+        const dailySummary = JSON.parse('{{ daily_summary | tojson }}');
+        const violationTypeDist = JSON.parse('{{ violation_type_dist | tojson }}');
+
+        // Function to render the hourly violation chart
+        function renderHourlyViolationChart() {
+            const ctx = document.getElementById('hourlyViolationChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(hourlyTrends).sort((a, b) => parseInt(a) - parseInt(b)), // Ensure hours are sorted
+                    datasets: [{
+                        label: 'Violations Count',
+                        data: Object.values(hourlyTrends),
+                        backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Number of Violations'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Hour of Day'
+                            }
+                        }
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Hourly Violation Trends'
+                        }
+                    }
+                }
+            });
+        }
+
+        // Function to render the daily compliance chart
+        function renderDailyComplianceChart() {
+            const ctx = document.getElementById('dailyComplianceChart').getContext('2d');
+            const dates = dailySummary.map(d => d.date);
+            const complianceRates = dailySummary.map(d => d.compliance_rate);
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: dates,
+                    datasets: [{
+                        label: 'Compliance Rate (%)',
+                        data: complianceRates,
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                        tension: 0.1,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            title: {
+                                display: true,
+                                text: 'Compliance Rate (%)'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Date'
+                            }
+                        }
+                    },
+                     plugins: {
+                        title: {
+                            display: true,
+                            text: 'Daily Compliance Rate'
+                        }
+                    }
+                }
+            });
+        }
+
+        // Function to render the violation type distribution chart
+        function renderViolationTypeDistChart() {
+            const ctx = document.getElementById('violationTypeDistChart').getContext('2d');
+            const labels = Object.keys(violationTypeDist);
+            const data = Object.values(violationTypeDist);
+            const backgroundColors = [
+                'rgba(255, 99, 132, 0.6)',
+                'rgba(54, 162, 235, 0.6)',
+                'rgba(255, 206, 86, 0.6)',
+                'rgba(75, 192, 192, 0.6)',
+                'rgba(153, 102, 255, 0.6)',
+                'rgba(255, 159, 64, 0.6)'
+            ];
+
+            new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Violations Count',
+                        data: data,
+                        backgroundColor: backgroundColors.slice(0, labels.length),
+                        borderColor: '#fff',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                     plugins: {
+                        title: {
+                            display: true,
+                            text: 'Violation Type Distribution'
+                        }
+                    }
+                }
+            });
+        }
+
+        // Render charts when the document is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            if (Object.keys(hourlyTrends).length > 0) renderHourlyViolationChart();
+            if (dailySummary.length > 0) renderDailyComplianceChart();
+            if (Object.keys(violationTypeDist).length > 0) renderViolationTypeDistChart();
+        });
+
+    </script>
+{% endblock %}

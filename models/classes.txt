@@ -1,0 +1,7 @@
+person
+helmet
+no-helmet
+vest
+no-vest
+gloves
+no-gloves
